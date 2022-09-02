@@ -16,8 +16,8 @@ Y = dfY.to_numpy()
 X = np.append(X,np.ones(X.shape),axis = 1)
 
 # Note: X is (num_examples*num_features)
-print(X.shape)
-print(Y.shape)
+#print(X.shape)
+#print(Y.shape)
 
 # normalization of input
 mean = np.mean(X[:,0])
@@ -83,9 +83,9 @@ def train(X,Y,theta):
         iteration += 1
     
     if draw_3d:
-        plt.savefig('../plots/1_c.png')
+        plt.savefig('plots/1_c.png')
     else:
-        plt.savefig('../plots/1_d_'+str(alpha)+'.png')
+        plt.savefig('plots/1_d_'+str(alpha)+'.png')
     #plt.show()
     
     print("Learning rate: "+str(alpha))
@@ -132,6 +132,7 @@ else:
 ax.set_xlabel('Theta[0]')
 ax.set_ylabel('Theta[1]')
 
+# run the algorithm...
 theta = train(X,Y,theta)
 
 # 2d plot for data and hypothesis
@@ -143,7 +144,7 @@ plt.title("Data and hypothesis plot")
 plt.xlabel("Wine Acidity")
 plt.ylabel("Wine Density")
 #plt.show()
-plt.savefig('../plots/1_b.png')
+plt.savefig('plots/1_b.png')
 
 # demo running to check the dimensionality and correctness of various operations in numpy.
 

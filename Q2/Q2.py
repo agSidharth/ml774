@@ -80,7 +80,7 @@ def train(X,Y,theta):
                 
             iteration += 1
     
-    plt.savefig('../plots/2_d.png')
+    plt.savefig('plots/2_d.png')
     print("Learning rate: "+str(alpha))
     print("Batch size used: "+str(batch_size))
     print("Iterations taken: "+str(iteration))
