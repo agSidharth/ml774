@@ -6,8 +6,8 @@ from mpl_toolkits import mplot3d
 
 #loading training data..
 
-dfX = pd.read_csv("/Users/sidharthagarwal/Desktop/assignments/ml774/data/q1/linearX.csv")
-dfY = pd.read_csv("/Users/sidharthagarwal/Desktop/assignments/ml774/data/q1/linearY.csv")
+dfX = pd.read_csv("data/q1/linearX.csv")
+dfY = pd.read_csv("data/q1/linearY.csv")
 
 X = dfX.to_numpy()
 Y = dfY.to_numpy()
@@ -16,8 +16,6 @@ Y = dfY.to_numpy()
 X = np.append(X,np.ones(X.shape),axis = 1)
 
 # Note: X is (num_examples*num_features)
-#print(X.shape)
-#print(Y.shape)
 
 # normalization of input
 mean = np.mean(X[:,0])
@@ -29,6 +27,8 @@ X[:,0] = X[:,0]/std
 print("Mean: " + str(mean))
 print("STD: "+str(std))
 
+
+# -------------- CHANGE PARAMETERS-------------
 # learning parameter and some more parameters initialization
 alpha = 0.1
 epsilon = 0.0000001
@@ -39,6 +39,8 @@ cost_list = []
 theta_list = [theta]
 
 draw_3d = False   # otherwise plot the scatter plot..
+
+# --------------xxxxxxxxxxx-------------
 
 if draw_3d:
     print("Creating the 3d plot")
@@ -85,8 +87,7 @@ def train(X,Y,theta):
     if draw_3d:
         plt.savefig('plots/1_c.png')
     else:
-        plt.savefig('plots/1_d_'+str(alpha)+'.png')
-    #plt.show()
+        plt.savefig('plots/1_d_'+str(alpha)+'.png',bbox_inches='tight')
     
     print("Learning rate: "+str(alpha))
     print("Iterations taken: "+str(iteration))
@@ -143,7 +144,6 @@ plt.scatter(X[:,0],predictions,label = "Predictions")
 plt.title("Data and hypothesis plot")
 plt.xlabel("Wine Acidity")
 plt.ylabel("Wine Density")
-#plt.show()
 plt.savefig('plots/1_b.png')
 
 # demo running to check the dimensionality and correctness of various operations in numpy.

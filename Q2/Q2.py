@@ -18,6 +18,8 @@ Y = x0*sample_theta[0][0] + x1*sample_theta[1][0] + x2*sample_theta[2][0] + nois
 X = np.append(x0,x1,axis = 1)
 X = np.append(X,x2,axis = 1)
 
+
+# -------------- CHANGE PARAMETERS-------------
 #initializing parameters
 
 alpha = 0.001
@@ -29,6 +31,7 @@ check_size = 2000
 
 cost_list = []
 theta_list = [theta]
+# --------------xxxxxxxx-------------
 
 # helper functions to compute cost, calculate the gradient and train the model..
 
@@ -51,7 +54,6 @@ def train(X,Y,theta):
     curr_cost = 0
     old_cost = 0
     
-    plt.figure()
     while(not finished):
         for idx in range(0,num_samples,batch_size):
             
@@ -93,7 +95,7 @@ theta = train(X,Y,theta)
 
 # testing on given input
 
-df = pd.read_csv("/Users/sidharthagarwal/Desktop/assignments/ml774/data/q2/q2test.csv")
+df = pd.read_csv("data/q2/q2test.csv")
 x0 = np.ones((df['X_1'].shape[0],1))
 x1 = np.array(df['X_1']).reshape(-1,1)
 x2 = np.array(df['X_2']).reshape(-1,1)
