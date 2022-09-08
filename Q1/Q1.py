@@ -38,7 +38,7 @@ theta = np.zeros((X.shape[1],1))
 cost_list = []
 theta_list = [theta]
 
-draw_3d = False   # otherwise plot the scatter plot..
+draw_3d = True   # otherwise plot the scatter plot..
 
 # --------------xxxxxxxxxxx-------------
 
@@ -81,7 +81,7 @@ def train(X,Y,theta):
             ax.scatter3D(theta[0],theta[1],curr_cost)
         elif (iteration%10==0):
             ax.scatter(theta[0],theta[1],marker='x')
-        #plt.pause(0.2)
+        plt.pause(0.2)
         iteration += 1
     
     if draw_3d:
