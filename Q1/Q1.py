@@ -83,16 +83,16 @@ def train(X,Y,theta):
             ax.scatter(theta[0],theta[1],marker='x')
         plt.pause(0.2)
         iteration += 1
-    
-    if draw_3d:
-        plt.savefig('plots/1_c.png')
-    else:
-        plt.savefig('plots/1_d_'+str(alpha)+'.png',bbox_inches='tight')
+    #if draw_3d:
+    #    plt.savefig('plots/1_c.png')
+    #else:
+    #    plt.savefig('plots/1_d_'+str(alpha)+'.png',bbox_inches='tight')
     
     print("Learning rate: "+str(alpha))
     print("Iterations taken: "+str(iteration))
     print("Epsilon for cost used: "+str(epsilon))
     print("Final Parameters: "+str(theta))
+    plt.show()
     return theta
 
 # Initialization for contour and 3d plots
@@ -144,7 +144,8 @@ plt.scatter(X[:,0],predictions,label = "Predictions")
 plt.title("Data and hypothesis plot")
 plt.xlabel("Wine Acidity")
 plt.ylabel("Wine Density")
-plt.savefig('plots/1_b.png')
+#plt.savefig('plots/1_b.png')
+plt.show()
 
 # demo running to check the dimensionality and correctness of various operations in numpy.
 
