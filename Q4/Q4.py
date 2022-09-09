@@ -118,16 +118,16 @@ slope = np.dot(covCommInv,(mean1 - mean0).transpose())
 intercept = math.log((phi)/(1-phi)) - (np.dot(np.dot(mean1,covCommInv),mean1.transpose()) - np.dot(np.dot(mean0,covCommInv),mean0.transpose()))/2
 
 x_lin = np.expand_dims(np.linspace(-2,2,100),axis = 1)
-y_lin   = (-1*x_lin*slope[0])/slope[1] - intercept/slope[1]
+y_lin   = (-1*x_lin*slope[0])/slope[1]
 
-plt.plot(x_lin, y_lin)
+plt.plot(x_lin, y_lin-intercept/slope[1])
 
 
 # for plotting the quadratic GDA
-xq0 = np.linspace(-2,2,100)
-xq1 = np.linspace(-2,2,100)
-xq0,xq1 = np.meshgrid(xq0,xq1)
-z = np.zeros(xq1.shape)
+xq0_temp = np.linspace(-2,2,100)
+xq1_temp = np.linspace(-2,2,100)
+z = np.zeros((xq1_temp.shape[0],xq1_temp.shape[0]))
+xq0,xq1 = np.meshgrid(xq0_temp,xq1_temp)
 
 quad_intercept = math.log(phi/(1-phi)) - np.log(np.linalg.det(cov1))/2 + np.log(np.linalg.det(cov0))/2
 
