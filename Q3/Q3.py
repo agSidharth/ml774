@@ -15,9 +15,6 @@ X = np.append(X,np.ones((X.shape[0],1)),axis = 1)
 dfY = pd.read_csv("/Users/sidharthagarwal/Desktop/assignments/ml774/data/q3/logisticY.csv")
 Y = dfY.to_numpy()
 
-print(X.shape)
-print(Y.shape)
-
 # Normalizing the data
 
 mean = np.mean(X[:,0:2],axis = 0)
@@ -31,7 +28,7 @@ X[:,0:2] = X[:,0:2]/std
 
 # initialization of parameters
 theta = np.zeros((X.shape[1],1))
-epsilon = 0.01
+epsilon = 0.0001
 
 #print(theta)
 
@@ -108,4 +105,5 @@ plt.legend()
 plt.xlabel("x1")
 plt.ylabel("x2")
 plt.title("Logistic Regression")
-plt.show()
+plt.savefig("3.png")
+#plt.show()

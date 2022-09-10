@@ -3,11 +3,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from mpl_toolkits import mplot3d
+import sys
 
 #loading training data..
+training_dir = str(sys.argv[1])
+testing_dir  = str(sys.argv[2])
 
-dfX = pd.read_csv("data/q1/linearX.csv")
-dfY = pd.read_csv("data/q1/linearY.csv")
+dfX = pd.read_csv(training_dir+"/X.csv")
+dfY = pd.read_csv(training_dir+"/Y.csv")
 
 X = dfX.to_numpy()
 Y = dfY.to_numpy()
@@ -30,15 +33,15 @@ print("STD: "+str(std))
 
 # -------------- CHANGE PARAMETERS-------------
 # learning parameter and some more parameters initialization
-alpha = 0.1
-epsilon = 0.0000001
+alpha = 0.005
+epsilon = 0.00000001
 max_iter = 10000
 theta = np.zeros((X.shape[1],1))
 
 cost_list = []
 theta_list = [theta]
 
-draw_3d = True   # otherwise plot the scatter plot..
+draw_3d = False   # otherwise plot the scatter plot..
 
 # --------------xxxxxxxxxxx-------------
 
@@ -70,7 +73,6 @@ def train(X,Y,theta):
         curr_cost = cost(X,Y,theta)
         theta = cost_grad_update(X,Y,theta,alpha)
 
-        finished = finished | (iteration>=max_iter)
         if(iteration>0):
             finished = finished | (abs(curr_cost - cost_list[-1])<epsilon)
 
@@ -83,16 +85,18 @@ def train(X,Y,theta):
             ax.scatter(theta[0],theta[1],marker='x')
         plt.pause(0.2)
         iteration += 1
-    #if draw_3d:
-    #    plt.savefig('plots/1_c.png')
-    #else:
-    #    plt.savefig('plots/1_d_'+str(alpha)+'.png',bbox_inches='tight')
+    
+    if draw_3d:
+        plt.savefig('1_c.png')
+    else:
+        plt.savefig('1_d_'+str(alpha)+'.png',bbox_inches='tight')
     
     print("Learning rate: "+str(alpha))
     print("Iterations taken: "+str(iteration))
     print("Epsilon for cost used: "+str(epsilon))
     print("Final Parameters: "+str(theta))
-    plt.show()
+    print("Final loss: "+str(curr_cost))
+    #plt.show()
     return theta
 
 # Initialization for contour and 3d plots
@@ -115,7 +119,7 @@ Zg = []
 for i in range(Xg.shape[0]):
     Zg.append([])
     for j in range(Xg.shape[1]):
-        Zg[i].append(cost(X,Y,np.array([Xg[i][j],Yg[i][j]])))
+        Zg[i].append(cost(X,Y,np.array([[Xg[i][j]],[Yg[i][j]]])))
 
 Zg = np.array(Zg)
 
@@ -140,12 +144,12 @@ theta = train(X,Y,theta)
 plt.figure()
 predictions = np.dot(X,theta)
 plt.scatter(X[:,0],Y,label = "Ground Truth")
-plt.scatter(X[:,0],predictions,label = "Predictions")
+plt.plot(X[:,0],predictions,label = "Predictions",color = 'red')
 plt.title("Data and hypothesis plot")
 plt.xlabel("Wine Acidity")
 plt.ylabel("Wine Density")
-#plt.savefig('plots/1_b.png')
-plt.show()
+plt.savefig('1_b.png')
+#plt.show()
 
 # demo running to check the dimensionality and correctness of various operations in numpy.
 
@@ -154,3 +158,23 @@ plt.show()
 #print(check1.shape)
 #print(check2.shape)
 #print(np.dot(check1,check2))
+
+# Testing on the test data
+print("Testing on the test data")
+dfX_test = pd.read_csv(testing_dir+"/X.csv")
+
+X_test = dfX_test.to_numpy()
+
+# adding intercept in X
+X_test = np.append(X_test,np.ones(X_test.shape),axis = 1)
+
+X_test[:,0] = X_test[:,0]-mean
+X_test[:,0] = X_test[:,0]/std
+
+test_predictions = np.dot(X_test,theta)
+file = open("result_1.txt","w")
+
+for idx in range(test_predictions.shape[0]):
+    file.write(str(test_predictions[idx][0])+str("\n"))
+
+file.close()

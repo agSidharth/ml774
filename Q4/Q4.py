@@ -144,5 +144,5 @@ plt.legend()
 plt.xlabel("x0")
 plt.ylabel("x1")
 plt.title("GDA")
-plt.show()
+plt.savefig("4.png")
 
