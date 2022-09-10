@@ -33,7 +33,7 @@ print("STD: "+str(std))
 
 # -------------- CHANGE PARAMETERS-------------
 # learning parameter and some more parameters initialization
-alpha = 0.005
+alpha = 0.1
 epsilon = 0.00000001
 max_iter = 10000
 theta = np.zeros((X.shape[1],1))
@@ -165,7 +165,7 @@ dfX_test = pd.read_csv(testing_dir+"/X.csv")
 
 X_test = dfX_test.to_numpy()
 
-# adding intercept in X
+# adding intercept in X_test
 X_test = np.append(X_test,np.ones(X_test.shape),axis = 1)
 
 X_test[:,0] = X_test[:,0]-mean

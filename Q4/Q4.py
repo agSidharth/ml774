@@ -4,11 +4,18 @@ import numpy as np
 import pandas as pd
 from mpl_toolkits import mplot3d
 import math
+import sys
+
+training_dir = str(sys.argv[1])
+testing_dir  = str(sys.argv[2])
 
 #loading training data..
 
-X = np.loadtxt('/Users/sidharthagarwal/Desktop/assignments/ml774/data/q4/q4x.dat')
-Y_str = np.loadtxt('/Users/sidharthagarwal/Desktop/assignments/ml774/data/q4/q4y.dat',dtype = str)
+#X = np.loadtxt(training_dir+"/X.dat")
+#Y_str = np.loadtxt(training_dir+"/Y.dat",dtype = str)
+
+X = np.loadtxt(training_dir+"/X.csv",delimiter=",")
+Y_str = np.loadtxt(training_dir+"/Y.csv",delimiter=",",dtype = str)
 
 Y = []
 for idx in range(Y_str.shape[0]):
@@ -129,13 +136,16 @@ xq1_temp = np.linspace(-2,2,100)
 z = np.zeros((xq1_temp.shape[0],xq1_temp.shape[0]))
 xq0,xq1 = np.meshgrid(xq0_temp,xq1_temp)
 
+sigma0 = np.linalg.inv(cov0)
+sigma1 = np.linalg.inv(cov1)
+
 quad_intercept = math.log(phi/(1-phi)) - np.log(np.linalg.det(cov1))/2 + np.log(np.linalg.det(cov0))/2
 
 for idx in range(z.shape[0]):
     for jdx in range(z.shape[1]):
-        x_this = np.array([[xq1[idx][jdx],xq0[idx][jdx]]])
-        z[idx][jdx] = np.dot(np.dot(x_this-mean0,cov0),(x_this - mean0).transpose()) + intercept
-        z[idx][jdx] -= np.dot(np.dot(x_this-mean1,cov1),(x_this-mean1).transpose())
+        x_this = np.array([[xq0[idx][jdx],xq1[idx][jdx]]])
+        z[idx][jdx] = np.dot(np.dot(x_this-mean0,sigma0),(x_this - mean0).transpose()) + intercept
+        z[idx][jdx] -= np.dot(np.dot(x_this-mean1,sigma1),(x_this-mean1).transpose())
 
 plt.contour(xq0,xq1,z,levels = [0])
         
@@ -146,3 +156,25 @@ plt.ylabel("x1")
 plt.title("GDA")
 plt.savefig("4.png")
 
+# Testing on the given data..
+print("Testing on the given data..")
+
+#X_test = np.loadtxt(testing_dir+"/X.dat")
+X_test = np.loadtxt(testing_dir+"/X.csv",delimiter=",")
+
+X_test = X_test - mean
+X_test = X_test/std
+
+file = open("result_4.txt","w")
+
+for idx in range(X_test.shape[0]):
+    x_this = X_test[idx:idx+1]
+    p1 = (np.exp(-1*0.5*(np.dot(np.dot(x_this-mean1,sigma1),(x_this-mean1).transpose())))*phi)/math.sqrt((np.linalg.det(cov1)))
+    p0 = (np.exp(-1*0.5*(np.dot(np.dot(x_this-mean0,sigma0),(x_this-mean0).transpose())))*(1-phi))/math.sqrt((np.linalg.det(cov0)))
+    #print(str(p1)+":"+str(p0))
+    if(p1>=p0):
+        file.write("Alaska\n")
+    else:
+        file.write("Canada\n")
+
+file.close()

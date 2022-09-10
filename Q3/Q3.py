@@ -3,16 +3,19 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
 
+training_dir = str(sys.argv[1])
+testing_dir  = str(sys.argv[2])
 
 # Reading data
-df = pd.read_csv("/Users/sidharthagarwal/Desktop/assignments/ml774/data/q3/logisticX.csv")
+df = pd.read_csv(training_dir+"/X.csv")
 X  = df.to_numpy()
 
 # adding intercept in X in the last dimension...
 X = np.append(X,np.ones((X.shape[0],1)),axis = 1)
 
-dfY = pd.read_csv("/Users/sidharthagarwal/Desktop/assignments/ml774/data/q3/logisticY.csv")
+dfY = pd.read_csv(training_dir+"/Y.csv")
 Y = dfY.to_numpy()
 
 # Normalizing the data
@@ -23,8 +26,6 @@ std  = np.std(X[:,0:2],axis = 0)
 X[:,0:2] = X[:,0:2]-mean
 X[:,0:2] = X[:,0:2]/std
 
-#print(mean)
-#print(std)
 
 # initialization of parameters
 theta = np.zeros((X.shape[1],1))
@@ -107,3 +108,26 @@ plt.ylabel("x2")
 plt.title("Logistic Regression")
 plt.savefig("3.png")
 #plt.show()
+
+# Testing on given data
+print("Testing on the test data")
+dfX_test = pd.read_csv(testing_dir+"/X.csv")
+
+X_test = dfX_test.to_numpy()
+
+# adding intercept in X_test
+X_test = np.append(X_test,np.ones((X_test.shape[0],1)),axis = 1)
+
+X_test[:,0:2] = X_test[:,0:2]-mean
+X_test[:,0:2] = X_test[:,0:2]/std
+
+test_predictions = sigmoid(X_test,theta)
+file = open("result_3.txt","w")
+
+for idx in range(test_predictions.shape[0]):
+    if test_predictions[idx][0]>=0.5:
+        file.write("1\n")
+    else:
+        file.write("0\n")
+
+file.close()

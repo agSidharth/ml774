@@ -4,7 +4,9 @@ import random
 import matplotlib.pyplot as plt
 import pandas as pd
 import time
+import sys
 
+testing_dir = str(sys.argv[1])
 
 # sampling points
 num_samples = 1000000
@@ -28,7 +30,7 @@ alpha = 0.001
 epsilon = 0.001
 
 theta = np.zeros((sample_theta.size,1))
-batch_size = 1000000
+batch_size = 1000
 check_size = 1000
 min_iter = (X.shape[0]/batch_size)
 
@@ -100,20 +102,32 @@ def train(X,Y,theta):
 START_TIME = time.time()
 theta = train(X,Y,theta)
 print("Time taken : "+str(time.time()-START_TIME))
+
+
 # testing on given input
 
-df = pd.read_csv("data/q2/q2test.csv")
+df = pd.read_csv(testing_dir+"/X.csv")
 x0 = np.ones((df['X_1'].shape[0],1))
 x1 = np.array(df['X_1']).reshape(-1,1)
 x2 = np.array(df['X_2']).reshape(-1,1)
 
-Y_test = np.array(df['Y']).reshape(-1,1)
 X_test_temp = np.append(x0,x1,axis = 1)
 X_test = np.append(X_test_temp,x2,axis = 1)
 
+test_predictions = np.dot(X_test,theta)
+file = open("result_2.txt","w")
+
+for idx in range(test_predictions.shape[0]):
+    file.write(str(test_predictions[idx][0])+str("\n"))
+
+file.close()
+
+"""
+Y_test = np.array(df['Y']).reshape(-1,1)
 error_learned = cost(X_test,Y_test,theta)
 error_original = cost(X_test,Y_test,sample_theta)
 
 print("Test Error for learned model with batch_size = "+str(batch_size)+" : "+str(error_learned))
 print("Test Error for original hypthesis : "+str(error_original))
+"""
 
