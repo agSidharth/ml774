@@ -94,8 +94,8 @@ def trainModel(path,label,wordFreq,totalFreq,totalDocs,preprocessing = False,fea
         
     totalDocs[label] += len(listOfFiles)
 
-trainModel(training_dir+"/pos",1,wordFreq,totalFreq,totalDocs)
-trainModel(training_dir+"/neg",0,wordFreq,totalFreq,totalDocs)
+#trainModel(training_dir+"/pos",1,wordFreq,totalFreq,totalDocs)
+#trainModel(training_dir+"/neg",0,wordFreq,totalFreq,totalDocs)
 
 # Testing the model
 
@@ -180,6 +180,7 @@ def prediction(path,wordFreq,totalFreq,totalDocs,preprocessing = False,featuring
     
     print("The accuracy is : "+str(correct/total))
 
+"""
 vocabulary = len(set(list(wordFreq[0].keys()) + list(wordFreq[1].keys())))
 #print("For training dataset: ")
 #prediction(training_dir,wordFreq,totalFreq,totalDocs)
@@ -214,6 +215,7 @@ plt.savefig("1a_wordcloud_neg.png")
 totalPosB = len(os.listdir(testing_dir + "/pos"))
 totalNegB = len(os.listdir(testing_dir + "/neg"))
 
+"""
 print("For b.i the accuracy will be : 0.5")
 print("For b.ii the accuracy will be : "+str(totalPosB/(totalPosB+totalNegB)))
 
@@ -239,19 +241,20 @@ printConfusion(totalPosB,totalNegB,0,0)
 print("For part a: ")
 resultAnalysis(TP,FP,TN,FN)
 
+
 wordFreq,totalFreq,totalDocs,alpha,posCloudText,negCloudText,TP,FP,TN,FN,vocabulary = restartModel()
 trainModel(training_dir+"/pos",1,wordFreq,totalFreq,totalDocs,True)
 trainModel(training_dir+"/neg",0,wordFreq,totalFreq,totalDocs,True)
 
 vocabulary = len(set(list(wordFreq[0].keys()) + list(wordFreq[1].keys())))
-print("\n\nFor part d: ")
-print("Accuracy For training dataset: ")
+#print("\n\nFor part d: ")
+#print("Accuracy For training dataset: ")
 #prediction(training_dir,wordFreq,totalFreq,totalDocs,True)
 print("Accuracy For testing dataset: ")
 prediction(testing_dir,wordFreq,totalFreq,totalDocs,True)
 
-print("For part d: ")
-resultAnalysis(TP,FP,TN,FN)
+#print("For part d: ")
+#resultAnalysis(TP,FP,TN,FN)
 
 # wordclouds
 
@@ -275,6 +278,7 @@ plt.tight_layout(pad = 0)
 plt.title("Negative label")
 plt.savefig("1d_wordcloud_neg.png")
 
+"""
 # Qe
 
 wordFreq,totalFreq,totalDocs,alpha,posCloudText,negCloudText,TP,FP,TN,FN,vocabulary = restartModel()
@@ -284,14 +288,14 @@ trainModel(training_dir+"/neg",0,wordFreq,totalFreq,totalDocs,True,True)
 vocabulary = len(set(list(wordFreq[0].keys()) + list(wordFreq[1].keys())))
 
 print("\n\nFor part e: ")
-print("Accuracy For training dataset: ")
+#print("Accuracy For training dataset: ")
 #prediction(training_dir,wordFreq,totalFreq,totalDocs,True,True)
 
 print("Accuracy For testing dataset: ")
 prediction(testing_dir,wordFreq,totalFreq,totalDocs,True,True)
 
-print("For part e: ")
-resultAnalysis(TP,FP,TN,FN)
+#print("For part e: ")
+#resultAnalysis(TP,FP,TN,FN)
 
 # Qf
 #def resultAnalysis(TP,FP,TN,FN):
@@ -300,5 +304,3 @@ resultAnalysis(TP,FP,TN,FN)
 #    print("The precision is : "+str(prev))
 #    print("The recall is : "+str(rec))
 #    print("The F1 score is : "+str((2*prec*rec)/(prec+rec)))
-
-"""

@@ -208,7 +208,6 @@ plt.tight_layout(pad = 0)
 plt.title("Negative label")
 plt.savefig("1a_wordcloud_neg.png")
 
-"""
 # Qb
 
 totalPosB = len(os.listdir(testing_dir + "/pos"))
@@ -300,5 +299,3 @@ resultAnalysis(TP,FP,TN,FN)
 #    print("The precision is : "+str(prev))
 #    print("The recall is : "+str(rec))
 #    print("The F1 score is : "+str((2*prec*rec)/(prec+rec)))
-
-"""

@@ -186,6 +186,7 @@ vocabulary = len(set(list(wordFreq[0].keys()) + list(wordFreq[1].keys())))
 print("For testing dataset: ")
 prediction(testing_dir,wordFreq,totalFreq,totalDocs)
 
+"""
 # wordclouds
 
 wordcloud = WordCloud(width = 800, height = 800, background_color ='white',stopwords = set(),
@@ -208,14 +209,13 @@ plt.tight_layout(pad = 0)
 plt.title("Negative label")
 plt.savefig("1a_wordcloud_neg.png")
 
-"""
 # Qb
-
+"""
 totalPosB = len(os.listdir(testing_dir + "/pos"))
 totalNegB = len(os.listdir(testing_dir + "/neg"))
 
-print("For b.i the accuracy will be : 0.5")
-print("For b.ii the accuracy will be : "+str(totalPosB/(totalPosB+totalNegB)))
+#print("For b.i the accuracy will be : 0.5")
+#print("For b.ii the accuracy will be : "+str(totalPosB/(totalPosB+totalNegB)))
 
 # Qc
 
@@ -234,6 +234,7 @@ printConfusion(totalPosB/2,totalPosB/2,totalNegB/2,totalNegB/2)
 print("\nFor part b only positive: ")
 printConfusion(totalPosB,totalNegB,0,0)
 
+"""
 #Qd
 
 print("For part a: ")
@@ -300,5 +301,4 @@ resultAnalysis(TP,FP,TN,FN)
 #    print("The precision is : "+str(prev))
 #    print("The recall is : "+str(rec))
 #    print("The F1 score is : "+str((2*prec*rec)/(prec+rec)))
-
 """
