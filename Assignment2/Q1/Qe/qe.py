@@ -17,6 +17,10 @@ SHOW_CLOUD = True
 
 training_dir = str(sys.argv[1])
 testing_dir  = str(sys.argv[2])
+EXTRA_FEATURES = False
+
+if EXTRA_FEATURES:
+    print("Extra features set is used for part e\n")
 
 # Initializing variables..
 
@@ -92,6 +96,20 @@ def trainModel(path,label,wordFreq,totalFreq,totalDocs,preprocessing = False,fea
                 wordFreq[label][bigram]  += 1
                 totalFreq[label] += 1
         
+        if featuring and EXTRA_FEATURES:
+            prevWord0 = new_word_list[0]
+            prevWord1 = new_word_list[1]
+            for word in new_word_list[2:]:
+                trigram = prevWord0 + "|"+prevWord1 + "|" + word
+                prevWord0 = prevWord1
+                prevWord1 = word
+
+                if trigram not in wordFreq[label]:
+                    wordFreq[label][trigram] = 0
+                
+                wordFreq[label][trigram] += 1
+                totalFreq[label] += 1
+        
     totalDocs[label] += len(listOfFiles)
 
 #trainModel(training_dir+"/pos",1,wordFreq,totalFreq,totalDocs)
@@ -142,6 +160,22 @@ def predictLabel(path,wordFreq,totalFreq,totalDocs,isPosCloud,preprocessing,feat
             
             positive_prob += math.log(posFreq) - math.log(totalFreq[1] + alpha*vocabulary)
             negative_prob += math.log(negFreq) - math.log(totalFreq[0] + alpha*vocabulary)
+    
+    if featuring and EXTRA_FEATURES:
+        prevWord0 = new_word_list[0]
+        prevWord1 = new_word_list[1]
+
+        for word in new_word_list[2:]:
+            trigram = prevWord0 + "|"+ prevWord1 + "|" + word
+            prevWord0 = prevWord1
+            prevWord1 = word
+
+            posFreq = alpha if trigram not in wordFreq[1] else wordFreq[1][trigram] + alpha
+            negFreq = alpha if trigram not in wordFreq[0] else wordFreq[0][trigram] + alpha
+
+            positive_prob += math.log(posFreq) - math.log(totalFreq[1] + alpha*vocabulary)
+            negative_prob += math.log(negFreq) - math.log(totalFreq[0] + alpha*vocabulary)
+
             
     positive_prob +=  -1*math.log(totalDocs[0])
     negative_prob +=  -1*math.log(totalDocs[1])
