@@ -89,8 +89,8 @@ def cross_SVM(X,Y,X_test,Y_test,C_List,gamma,kfolds = 5):
 
         sumAcc += thisAcc
       
-      print(sum/kfolds)
-      print(maxAccxs)
+      #print(sumAcc/kfolds)
+      #print(maxAccxs)
       val_acc.append(sumAcc/kfolds)
       test_acc.append(maxTestAcc)
     
