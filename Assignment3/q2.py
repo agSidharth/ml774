@@ -47,18 +47,21 @@ class NeuralNet:
         self.EPSILON = EPSILON
 
         # note we will add one columnn for bias.
-        self.params = [np.random.randn(self.hidden_layers[0],self.num_features+1)]
+        norm_factor = np.sqrt(2/(self.num_features+1))
+        self.params = [np.random.randn(self.hidden_layers[0],self.num_features+1)*norm_factor]
 
         for idx in range(1,len(self.hidden_layers)):
-            self.params.append(np.random.randn(self.hidden_layers[idx],self.hidden_layers[idx-1]+1))
+            norm_factor = np.sqrt(2/(self.hidden_layers[idx-1]+1))
+            self.params.append(np.random.randn(self.hidden_layers[idx],self.hidden_layers[idx-1]+1)*norm_factor)
         
-        self.params.append(np.random.randn(self.target_classes,self.hidden_layers[-1]+1))
+        norm_factor = np.sqrt(2/(self.hidden_layers[-1]+1))
+        self.params.append(np.random.randn(self.target_classes,self.hidden_layers[-1]+1)*norm_factor)
     
     def activate(self,x,layerNum):
 
         if (layerNum == len(self.params) - 1) or (self.activation=="sigmoid"):
             return self.sigmoid(x)
-        return np.maximum(x,0)
+        return np.maximum(0,x)
     
     def de_activate(self,x,layerNum):
         if (layerNum == len(self.params) - 1) or (self.activation=="sigmoid"):
@@ -181,7 +184,31 @@ def plotGraph(values,name,hidden_layers):
     plt.savefig("2_"+name+".png")
     plt.figure()
 
-def partB(X_train,Y_train,X_test,Y_test,hidden_layer = [5,10,15,20,25],learning_rate = 0.1,learning_rate_type = "constant"):
+def trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate = 0.1,learning_rate_type="constant",activation = "sigmoid",verbose = False):
+    thisModel = NeuralNet(X_train.shape[0],100,10,learning_rate,hidden_layer,learning_rate_type=learning_rate_type,activation=activation)
+    start_time = time.time()
+
+    thisModel.train(X_train,Y_train)
+    trainTime = time.time()-start_time
+    
+    trainAcc = thisModel.accuracy(X_train,Y_train)
+    testAcc = (thisModel.accuracy(X_test,Y_test))
+
+    confMatrix = confusion_matrix(np.argmax(Y_test,axis = 0),thisModel.predict(X_test))
+
+    if verbose:
+        print("For hidden layers : "+str(hidden_layer))
+        print("For learningRateType : "+learning_rate_type+" , activation : "+activation)
+        print("Training time : "+str(trainTime))
+        print("Training accuracy : "+str(trainAcc))
+        print("Testing accurcay : "+str(testAcc))
+        print("The confusion matrix : ")
+        print(confMatrix)
+
+    return trainTime,trainAcc,testAcc,confMatrix
+
+
+def partBC(X_train,Y_train,X_test,Y_test,hidden_layer = [5,10,15,20,25],learning_rate = 0.1,learning_rate_type = "constant"):
 
     training_time = []
     acc_train = []
@@ -189,17 +216,16 @@ def partB(X_train,Y_train,X_test,Y_test,hidden_layer = [5,10,15,20,25],learning_
 
     for thisH in hidden_layer:
         print("For size : "+str(thisH))
-        thisModel = NeuralNet(X_train.shape[0],100,10,0.1,[thisH],learning_rate_type = learning_rate_type)
-        start_time = time.time()
 
-        thisModel.train(X_train,Y_train)
+        thisTime,thisTrain,thisTest,thisConf = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate,learning_rate_type)
 
-        training_time.append(time.time()-start_time)
-        acc_train.append(thisModel.accuracy(X_train,Y_train))
-        acc_test.append(thisModel.accuracy(X_test,Y_test))
+        training_time.append(thisTime)
+        acc_train.append(thisTrain)
+        acc_test.append(thisTest)
         
         print("The confusion matrix for size "+str(thisH)+" is")
-        print(confusion_matrix(np.argmax(Y_test,axis = 0),thisModel.predict(X_test)))
+        print(thisConf)
+        print("\n\n")
     
     return training_time,acc_train,acc_test
 
@@ -215,22 +241,29 @@ X_train,Y_train = readData(trainFile)
 X_test,Y_test = readData(testFile)
 hidden_layer = [5,10,15,20]
 
-"""
 # Part B
 
-training_time,acc_train,acc_test = partB(X_train,Y_train,X_test,Y_test,hidden_layer)
+training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer)
 
 plotGraph(training_time,"b_time",hidden_layer)
 plotGraph(acc_train,"b_train_acc",hidden_layer)
 plotGraph(acc_test,"b_test_acc",hidden_layer)
+
 """
 # Part C
 print("Using Adaptive Learning")
-training_time,acc_train,acc_test = partB(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive")
+training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive")
 
 plotGraph(training_time,"c_time",hidden_layer)
 plotGraph(acc_train,"c_train_acc",hidden_layer)
 plotGraph(acc_test,"c_test_acc",hidden_layer)
 
 
+# Part D
+print("For part D:\n")
+hidden_layer = [100,100]
+trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",verbose = True)
+trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",verbose = True)
 
+
+"""
