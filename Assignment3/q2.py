@@ -24,6 +24,7 @@ from nltk.corpus import stopwords
 import time
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import shuffle
+from sklearn.neural_network import MLPClassifier
 
 def readData(filename):
   data = np.loadtxt(filename,delimiter = ',')
@@ -241,6 +242,7 @@ X_train,Y_train = readData(trainFile)
 X_test,Y_test = readData(testFile)
 hidden_layer = [5,10,15,20]
 
+"""
 # Part B
 
 training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer)
@@ -249,7 +251,7 @@ plotGraph(training_time,"b_time",hidden_layer)
 plotGraph(acc_train,"b_train_acc",hidden_layer)
 plotGraph(acc_test,"b_test_acc",hidden_layer)
 
-"""
+
 # Part C
 print("Using Adaptive Learning")
 training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive")
@@ -260,10 +262,33 @@ plotGraph(acc_test,"c_test_acc",hidden_layer)
 
 
 # Part D
+
 print("For part D:\n")
-hidden_layer = [100,100]
+hidden_layer = [50,50,50]
 trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",verbose = True)
 trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",verbose = True)
 
-
+hidden_layer = [50,50,50,50]
+trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",verbose = True)
+trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",verbose = True)
 """
+
+# Part g
+
+clf = MLPClassifier([100,100],'relu',solver = 'sgd',batch_size = 100,learning_rate_init = 0.1,max_iter = 200,random_state = SEED,verbose = True)
+
+start_time = time.time()
+clf.fit(X_train.T,Y_train.T)
+trainTime = time.time() - start_time
+
+pred_train = np.argmax(clf.predict_proba(X_train.T),axis = 1)
+pred_test  = np.argmax(clf.predict_proba(X_test.T),axis = 1)
+
+trainAcc = np.sum(pred_train==np.argmax(Y_train.T,axis = 1))/Y_train.shape[1]
+
+testAcc  = np.sum(pred_test==np.argmax(Y_test.T,axis = 1))/Y_test.shape[1]
+
+print("Total time taken : "+str(time.time()-start_time))
+print("Training accuracy : "+str(trainAcc))
+print("Testing accuracy : "+str(testAcc))
+
