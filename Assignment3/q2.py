@@ -217,15 +217,15 @@ def partBC(X_train,Y_train,X_test,Y_test,hidden_layer = [5,10,15,20,25],learning
     for thisH in hidden_layer:
         print("For size : "+str(thisH))
 
-        thisTime,thisTrain,thisTest,thisConf = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate,learning_rate_type)
+        thisTime,thisTrain,thisTest,thisConf = trainTestModel(X_train,Y_train,X_test,Y_test,[thisH],learning_rate,learning_rate_type,verbose = True)
 
         training_time.append(thisTime)
         acc_train.append(thisTrain)
         acc_test.append(thisTest)
         
-        print("The confusion matrix for size "+str(thisH)+" is")
-        print(thisConf)
-        print("\n\n")
+        #print("The confusion matrix for size "+str(thisH)+" is")
+        #print(thisConf)
+        #print("\n\n")
     
     return training_time,acc_train,acc_test
 
