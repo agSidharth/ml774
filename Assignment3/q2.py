@@ -166,13 +166,15 @@ class NeuralNet:
                     self.params[idx] = self.params[idx] - curr_learning_rate*gradient[idx]
 
             #update parameters
-
             if self.adaptive_rate:
                 curr_learning_rate = self.learning_rate/np.sqrt(count+1)
 
             new_cost = self.cost(X,Y)
             if(abs(new_cost-prev_cost)<self.EPSILON): break
             count += 1
+
+            if DEBUG:
+                print("New accuracy : "+str(self.accuracy(X,Y)))
         
         print("Training has completed with final train accuracy : "+str(self.accuracy(X,Y)))
         
@@ -240,9 +242,9 @@ DEBUG = True
 
 X_train,Y_train = readData(trainFile)
 X_test,Y_test = readData(testFile)
-hidden_layer = [5,10,15,20]
+hidden_layer = [20]
 
-"""
+
 # Part B
 
 training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer)
@@ -251,7 +253,7 @@ plotGraph(training_time,"b_time",hidden_layer)
 plotGraph(acc_train,"b_train_acc",hidden_layer)
 plotGraph(acc_test,"b_test_acc",hidden_layer)
 
-
+"""
 # Part C
 print("Using Adaptive Learning")
 training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive")
@@ -271,7 +273,6 @@ trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_
 hidden_layer = [50,50,50,50]
 trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",verbose = True)
 trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",verbose = True)
-"""
 
 # Part g
 
@@ -291,4 +292,4 @@ testAcc  = np.sum(pred_test==np.argmax(Y_test.T,axis = 1))/Y_test.shape[1]
 print("Total time taken : "+str(time.time()-start_time))
 print("Training accuracy : "+str(trainAcc))
 print("Testing accuracy : "+str(testAcc))
-
+"""
