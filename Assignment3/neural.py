@@ -184,7 +184,10 @@ def plotGraph(values,name,hidden_layer):
     plt.xlabel("hidden layer size")
     plt.ylabel(name)
     plt.title(name+" vs hidden layer size")
-    plt.savefig("2_"+name+".png")
+
+    path = OUTPUT_DIR
+    path = os.path.join(path,"2_"+name+".png")
+    plt.savefig(path)
     plt.figure()
 
 def trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate = 0.1,learning_rate_type="constant",activation = "sigmoid",verbose = False,thisAxis = 0):
@@ -209,7 +212,7 @@ def trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate = 0.
         print(confMatrix)
         print('\n')
 
-    return trainTime,trainAcc,testAcc,confMatrix
+    return trainTime,trainAcc,testAcc,confMatrix,thisModel.predict(X_test)
 
 
 def partBC(X_train,Y_train,X_test,Y_test,hidden_layer = [5,10,15,20,25],learning_rate = 0.1,learning_rate_type = "constant",activation = "sigmoid",partD = False):
@@ -218,103 +221,146 @@ def partBC(X_train,Y_train,X_test,Y_test,hidden_layer = [5,10,15,20,25],learning
     acc_train = []
     acc_test  = []
 
+    best_acc = -1
+    best_Y_out = []
+
     for thisH in hidden_layer:
         print("For size : "+str(thisH))
 
         hidden2pass = [thisH]
         if partD:
             hidden2pass = thisH
-        thisTime,thisTrain,thisTest,thisConf = trainTestModel(X_train,Y_train,X_test,Y_test,hidden2pass,learning_rate,learning_rate_type,activation,verbose = True)
+        thisTime,thisTrain,thisTest,thisConf,temp_Y_out = trainTestModel(X_train,Y_train,X_test,Y_test,hidden2pass,learning_rate,learning_rate_type,activation,verbose = True)
             
         training_time.append(thisTime)
         acc_train.append(thisTrain)
         acc_test.append(thisTest)
         
+        if thisTest>best_acc:
+            best_acc = thisTest
+            best_Y_out = temp_Y_out
+
         """
         print("The confusion matrix for size "+str(thisH)+" is")
         print(thisConf)
         print("\n\n")
         """
     
-    return training_time,acc_train,acc_test
+    return training_time,acc_train,acc_test,best_Y_out,best_acc
 
-SEED = 50661
-np.random.seed(SEED)
+def printFileOutput(Y_test_pred,qPart):
+    filename = qPart+".txt"
+    path = OUTPUT_DIR
 
-trainFile = "COL774_fmnist/fmnist_train.csv"
-testFile = "COL774_fmnist/fmnist_test.csv"
+    path = os.path.join(path,filename)
+    thisFile = open(path,"w")
 
-DEBUG = False
-EPSILON = 1e-4
+    for out in Y_test_pred:
+        thisFile.write(str(out)+"\n")
 
-X_train,Y_train = readData(trainFile)
-X_test,Y_test = readData(testFile)
-
-
-"""
-# Part B
-print("For part B")
-hidden_layer = [5,10,15,20]
-training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer)
-
-plotGraph(training_time,"b_time",hidden_layer)
-plotGraph(acc_train,"b_train_acc",hidden_layer)
-plotGraph(acc_test,"b_test_acc",hidden_layer)
+    thisFile.close()
+    return 
 
 
+if __name__=="__main__":
+    
+    SEED = 50661
+    np.random.seed(SEED)
+    DEBUG = False
+    EPSILON = 1e-4
 
-# Part C
-print("For Part C")
-hidden_layer = [5,10,15,20]
-training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive")
+    trainFile = sys.argv[1]
+    testFile = sys.argv[2]
+    OUTPUT_DIR = sys.argv[3]
+    qPart = sys.argv[4]
 
-plotGraph(training_time,"c_time",hidden_layer)
-plotGraph(acc_train,"c_train_acc",hidden_layer)
-plotGraph(acc_test,"c_test_acc",hidden_layer)
+    X_train,Y_train = readData(trainFile)
+    X_test,Y_test = readData(testFile)
 
+    Y_out = []
+    if qPart=="a":
+        print("See this implementation in the code")
+        exit()
+    elif qPart=="b":
+        # Part B
+        print("For part B: \n")
+        hidden_layer = [5,10,15,20]
+        training_time,acc_train,acc_test,Y_out,temp= partBC(X_train,Y_train,X_test,Y_test,hidden_layer)
 
-# Part D
+        plotGraph(training_time,"b_time",hidden_layer)
+        plotGraph(acc_train,"b_train_acc",hidden_layer)
+        plotGraph(acc_test,"b_test_acc",hidden_layer)
+        print(temp)
+    elif qPart=="c":
+        # Part C
+        print("For Part C: \n")
+        hidden_layer = [5,10,15,20]
+        training_time,acc_train,acc_test,Y_out,temp = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive")
 
-print("For part D:\n")
-hidden_layer = [100,100]
-trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",verbose = True)
-trainTime,trainAcc,testAcc,confMatrix = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",verbose = True)
+        plotGraph(training_time,"c_time",hidden_layer)
+        plotGraph(acc_train,"c_train_acc",hidden_layer)
+        plotGraph(acc_test,"c_test_acc",hidden_layer)
+        print(temp)
+    elif qPart=="d":
+        # Part D
 
+        print("For part D:\n")
+        hidden_layer = [100,100]
+        trainTime,trainAcc,testAcc1,confMatrix,Y_out1 = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",verbose = True)
+        trainTime,trainAcc,testAcc2,confMatrix,Y_out2 = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",verbose = True)
 
-# Part E
-print("For part E:\n")
-hidden_layer = [[50,50],[50,50,50],[50,50,50,50],[50,50,50,50,50]]
-len_layers = [2,3,4,5]
+        print(testAcc1)
+        print(testAcc2)
+        if testAcc1>testAcc2: Y_out = Y_out1
+        else: Y_out = Y_out2
 
-training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",partD = True)
+    elif qPart=="e":
+        # Part E
+        print("For part E:\n")
+        hidden_layer = [[50,50],[50,50,50],[50,50,50,50],[50,50,50,50,50]]
+        len_layers = [2,3,4,5]
 
-plotGraph(training_time,"e_relu_time",len_layers)
-plotGraph(acc_train,"e_relu_train_acc",len_layers)
-plotGraph(acc_test,"e_relu_test_acc",len_layers)
+        training_time,acc_train,acc_test,Y_out_r,best_r = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",partD = True)
 
-training_time,acc_train,acc_test = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",partD = True)
+        plotGraph(training_time,"e_relu_time",len_layers)
+        plotGraph(acc_train,"e_relu_train_acc",len_layers)
+        plotGraph(acc_test,"e_relu_test_acc",len_layers)
 
-plotGraph(training_time,"e_sig_time",len_layers)
-plotGraph(acc_train,"e_sig_train_acc",len_layers)
-plotGraph(acc_test,"e_sig_test_acc",len_layers)
+        training_time,acc_train,acc_test,Y_out_s,best_s = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",partD = True)
 
-"""
-# Part g
-print("For part G:\n")
-clf = MLPClassifier([50,50,50],'relu',solver = 'sgd',batch_size = 100,learning_rate_init = 0.1,max_iter = 200,random_state = SEED,verbose = False)
+        plotGraph(training_time,"e_sig_time",len_layers)
+        plotGraph(acc_train,"e_sig_train_acc",len_layers)
+        plotGraph(acc_test,"e_sig_test_acc",len_layers)
 
-start_time = time.time()
-clf.fit(X_train.T,Y_train.T)
-trainTime = time.time() - start_time
+        print(best_r)
+        print(best_s)
+        if best_r>best_s: Y_out = Y_out_r
+        else: Y_out = Y_out_s
 
-pred_train = np.argmax(clf.predict_proba(X_train.T),axis = 1)
-pred_test  = np.argmax(clf.predict_proba(X_test.T),axis = 1)
+    elif qPart=="f":
+        print("For part F: \n")
+        exit()
+    elif qPart=="g":
+        # Part g
+        print("For part G:\n")
+        clf = MLPClassifier([50,50,50],'relu',solver = 'sgd',batch_size = 100,learning_rate_init = 0.1,max_iter = 200,random_state = SEED,verbose = False)
 
-trainAcc = np.sum(pred_train==np.argmax(Y_train.T,axis = 1))/Y_train.shape[1]
+        start_time = time.time()
+        clf.fit(X_train.T,Y_train.T)
+        trainTime = time.time() - start_time
 
-testAcc  = np.sum(pred_test==np.argmax(Y_test.T,axis = 1))/Y_test.shape[1]
+        pred_train = np.argmax(clf.predict_proba(X_train.T),axis = 1)
+        pred_test  = np.argmax(clf.predict_proba(X_test.T),axis = 1)
 
-print("Total time taken : "+str(time.time()-start_time))
-print("Training accuracy : "+str(trainAcc))
-print("Testing accuracy : "+str(testAcc))
+        trainAcc = np.sum(pred_train==np.argmax(Y_train.T,axis = 1))/Y_train.shape[1]
+
+        testAcc  = np.sum(pred_test==np.argmax(Y_test.T,axis = 1))/Y_test.shape[1]
+
+        print("Total time taken : "+str(time.time()-start_time))
+        print("Training accuracy : "+str(trainAcc))
+        print("Testing accuracy : "+str(testAcc))
+
+        Y_out = pred_test
+    
+    printFileOutput(Y_out,qPart)
 
