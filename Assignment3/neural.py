@@ -25,6 +25,7 @@ import xgboost as xgb
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils import shuffle
 from sklearn.neural_network import MLPClassifier
+import os
 
 def readData(filename):
   data = np.loadtxt(filename,delimiter = ',')
@@ -290,7 +291,7 @@ if __name__=="__main__":
         plotGraph(training_time,"b_time",hidden_layer)
         plotGraph(acc_train,"b_train_acc",hidden_layer)
         plotGraph(acc_test,"b_test_acc",hidden_layer)
-        print(temp)
+        #print(temp)
     elif qPart=="c":
         # Part C
         print("For Part C: \n")
@@ -300,7 +301,7 @@ if __name__=="__main__":
         plotGraph(training_time,"c_time",hidden_layer)
         plotGraph(acc_train,"c_train_acc",hidden_layer)
         plotGraph(acc_test,"c_test_acc",hidden_layer)
-        print(temp)
+        #print(temp)
     elif qPart=="d":
         # Part D
 
@@ -309,8 +310,8 @@ if __name__=="__main__":
         trainTime,trainAcc,testAcc1,confMatrix,Y_out1 = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",verbose = True)
         trainTime,trainAcc,testAcc2,confMatrix,Y_out2 = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",verbose = True)
 
-        print(testAcc1)
-        print(testAcc2)
+        #print(testAcc1)
+        #print(testAcc2)
         if testAcc1>testAcc2: Y_out = Y_out1
         else: Y_out = Y_out2
 
@@ -320,20 +321,22 @@ if __name__=="__main__":
         hidden_layer = [[50,50],[50,50,50],[50,50,50,50],[50,50,50,50,50]]
         len_layers = [2,3,4,5]
 
+        print("For relu")
         training_time,acc_train,acc_test,Y_out_r,best_r = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",partD = True)
 
         plotGraph(training_time,"e_relu_time",len_layers)
         plotGraph(acc_train,"e_relu_train_acc",len_layers)
         plotGraph(acc_test,"e_relu_test_acc",len_layers)
 
+        print("For sigmoid")
         training_time,acc_train,acc_test,Y_out_s,best_s = partBC(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "sigmoid",partD = True)
 
         plotGraph(training_time,"e_sig_time",len_layers)
         plotGraph(acc_train,"e_sig_train_acc",len_layers)
         plotGraph(acc_test,"e_sig_test_acc",len_layers)
 
-        print(best_r)
-        print(best_s)
+        #print(best_r)
+        #print(best_s)
         if best_r>best_s: Y_out = Y_out_r
         else: Y_out = Y_out_s
 
