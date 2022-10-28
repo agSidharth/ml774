@@ -26,7 +26,7 @@ def returnDataText(filename,isTrain = False):
     if SAMPLE_SIZE==None or isTrain==False:
       df = df_temp
     else:
-      df = df_temp.sample(SAMPLE_SIZE,random_state = SEED)
+      df = df_temp.sample(SAMPLE_SIZE,random_state = SEED,replace = True)
     
     text_vector = df["condition"] + " " + df["review"] + " "+ df["date"]
     #print(text_vector.shape)
@@ -76,7 +76,7 @@ def plotGraph(pruneDict,values,name):
 
 def handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart):
 
-    print("Runing for part : "+qPart)
+    print("Running for part : "+qPart)
     if qPart=="a":
         clf = DecisionTreeClassifier(random_state = SEED)
         start_time = time.time()
@@ -107,10 +107,22 @@ def handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart):
         testList = []
         valList = []
 
-        best_clf = None
+        best_clf = DecisionTreeClassifier(random_state = SEED)
+        best_clf.fit(X_train,Y_train)
         best_val_acc = -1
 
         start_time = time.time()
+
+        newAlphas = []
+        for thisAlpha in pruneDict["ccp_alphas"]:
+            if thisAlpha>= 1e-6 and thisAlpha<1e-5:
+                newAlphas.append(thisAlpha)
+            
+            if len(newAlphas)>10:
+                break
+        
+        pruneDict["ccp_alphas"] = newAlphas
+
         for thisAlpha in pruneDict["ccp_alphas"]:
             clf = DecisionTreeClassifier(ccp_alpha = thisAlpha,random_state = SEED)
             clf.fit(X_train,Y_train)
@@ -133,14 +145,14 @@ def handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart):
 
         print("Time taken : "+str(time.time()-start_time))
 
+        if (len(pruneDict)>0):
+            plotGraph(pruneDict,numNodesList,'num_nodes')
+            plotGraph(pruneDict,depthList,'max_depth')
+            plotGraph(pruneDict,trainList,'train_accu')
+            plotGraph(pruneDict,testList,'test_accu')
+            plotGraph(pruneDict,valList,'val_accu')
+            printAccuracies(best_clf)
 
-        plotGraph(pruneDict,numNodesList,'num_nodes')
-        plotGraph(pruneDict,depthList,'max_depth')
-        plotGraph(pruneDict,trainList,'train_accu')
-        plotGraph(pruneDict,testList,'test_accu')
-        plotGraph(pruneDict,valList,'val_accu')
-
-        printAccuracies(best_clf)
     elif qPart=="d":
         # 1.d
 
@@ -150,9 +162,9 @@ def handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart):
 
         start_time = time.time()
         best_clf = doGridSearch(RandomForestClassifier(random_state = SEED,oob_score = True),param_grid)
-        print("Time taken : "+str(time.time()-start_time))
-        printAccuracies(best_clf)
         print('OOB score : '+str(best_clf.oob_score_))
+        print("Time taken : "+str(time.time()-start_time))
+
     elif qPart=="e":
         param_grid = {'n_estimators' : [50,100,150,200,250,300,350,400,450],
               'subsample' : [0.4,0.5,0.6,0.7,0.8],
@@ -162,7 +174,13 @@ def handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart):
         clf = doGridSearch(xgb.XGBClassifier(),param_grid)
         print("Time taken : "+str(time.time()-start_time))
     elif qPart=="f":
-        pass
+        import lightgbm as lgb
+        clf = lgb.LGBMClassifier()
+
+        start_time = time.time()
+        clf.fit(X_train,Y_train)
+        printAccuracies(clf)
+        print("Time taken : "+str(time.time()-start_time))
     elif qPart=="g":
         pass
     else:
@@ -184,11 +202,34 @@ if __name__=="__main__":
     qPart = sys.argv[5]
 
     DATASET_IND = "2_"
+    filename = DATASET_IND+qPart+".txt"
+    path = os.path.join(OUTPUT_DIR,filename)
+    thisFile = open(path,"w")
+
+    original_stdout = sys.stdout
+    sys.stdout = thisFile
+
     vectorizer = TfidfVectorizer(stop_words = STOP_WORDS,min_df = MIN_DF)
 
-    X_train,Y_train = returnDataText(trainFile,True)
-    X_test,Y_test = returnDataText(testFile)
-    X_val,Y_val = returnDataText(valFile)
+    if qPart!="g":
+        
+        X_train,Y_train = returnDataText(trainFile,True)
+        X_test,Y_test = returnDataText(testFile)
+        X_val,Y_val = returnDataText(valFile)
+        
+        handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart)
+    else:
+        print("Running for part : g\n")
+        for thisSize in [20000,40000,60000,80000,100000,120000,140000,160000]:
+            SAMPLE_SIZE = thisSize
+            print("\nFor training set sample size : "+str(SAMPLE_SIZE))
 
-    handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart)
+            X_train,Y_train = returnDataText(trainFile,True)
+            X_test,Y_test = returnDataText(testFile)
+            X_val,Y_val = returnDataText(valFile)
+
+            for qPart in ['a','b','c','d','e','f']:
+                handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart)
+
+    sys.stdout = original_stdout
 

@@ -47,6 +47,7 @@ class NeuralNet:
         self.max_epochs = max_epochs
         self.adaptive_rate = (learning_rate_type=="adaptive")
         self.EPSILON = EPSILON
+        self.BCE = False
 
         # for norm_factor see this link "https://stats.stackexchange.com/questions/47590/what-are-good-initial-weights-in-a-neural-network"
         # another link "https://towardsdatascience.com/weight-initialization-in-neural-networks-a-journey-from-the-basics-to-kaiming-954fb9b47c79"
@@ -103,7 +104,11 @@ class NeuralNet:
         self.delta = []
 
         temp = self.preactivation[len(self.params)-1]
-        temp = (x - self.output[len(self.params)-1])*(self.de_activate(temp,len(self.params)-1))
+
+        if self.BCE:
+            temp = (1/(np.ones_like(x) - x - self.output[len(self.params)-1]))*(self.de_activate(temp,len(self.params)-1))
+        else:
+            temp = (x - self.output[len(self.params)-1])*(self.de_activate(temp,len(self.params)-1))
 
         self.delta.append(temp)
 
@@ -269,11 +274,19 @@ if __name__=="__main__":
     np.random.seed(SEED)
     DEBUG = False
     EPSILON = 1e-4
+    BCE = False
 
     trainFile = sys.argv[1]
     testFile = sys.argv[2]
     OUTPUT_DIR = sys.argv[3]
     qPart = sys.argv[4]
+
+    filename = qPart+".txt"
+    path = os.path.join(OUTPUT_DIR,filename)
+    thisFile = open(path,"w")
+
+    original_stdout = sys.stdout
+    sys.stdout = thisFile
 
     X_train,Y_train = readData(trainFile)
     X_test,Y_test = readData(testFile)
@@ -342,7 +355,12 @@ if __name__=="__main__":
 
     elif qPart=="f":
         print("For part F: \n")
-        exit()
+
+        BCE = True
+        hidden_layer = [50,50,50]
+        trainTime,trainAcc,testAcc,confMatrix,Y_out = trainTestModel(X_train,Y_train,X_test,Y_test,hidden_layer,learning_rate_type="adaptive",activation = "relu",verbose = True)
+        BCE = False
+        
     elif qPart=="g":
         # Part g
         print("For part G:\n")
@@ -365,5 +383,6 @@ if __name__=="__main__":
 
         Y_out = pred_test
     
-    printFileOutput(Y_out,qPart)
+    #printFileOutput(Y_out,qPart)
+    sys.stdout = original_stdout
 

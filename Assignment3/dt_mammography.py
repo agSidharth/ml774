@@ -78,7 +78,7 @@ def plotGraph(pruneDict,values,name):
 
 def handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart):
 
-    print("Runing for part : "+qPart)
+    print("Running for part : "+qPart)
     if qPart=="a":
         clf = DecisionTreeClassifier(random_state = SEED)
         clf.fit(X_train,Y_train)
@@ -204,6 +204,12 @@ if __name__=="__main__":
     qPart = sys.argv[5]
 
     DATASET_IND = "1_"
+    filename = DATASET_IND+qPart+".txt"
+    path = os.path.join(OUTPUT_DIR,filename)
+    thisFile = open(path,"w")
+
+    original_stdout = sys.stdout
+    sys.stdout = thisFile
 
     if qPart!="e":
         
@@ -214,9 +220,10 @@ if __name__=="__main__":
         X_val,Y_val = returnData(valFile)
 
         clf = handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart)
-        printFileOutput(clf,qPart,X_test)
+        #printFileOutput(clf,qPart,X_test)
     
     else:
+        print("Running for part : e")
         DATA_IMPUTE = "mean"
         print("\nFor data imputing with "+DATA_IMPUTE+"\n")
         X_train,Y_train = returnData(trainFile)
@@ -235,7 +242,9 @@ if __name__=="__main__":
         for qPart in ['a','b','c','d']:
             clf = handlePart(X_train,X_test,X_val,Y_train,Y_test,Y_val,qPart)
         
-        printFileOutput(clf,"e",X_test)
+        #printFileOutput(clf,"e",X_test)
+    
+    sys.stdout = original_stdout
 
 
 
