@@ -131,6 +131,9 @@ class NeuralNet:
         return np.argmax(self.forward(x),axis = thisAxis)
 
     def cost(self,x,y):
+        if self.BCE:
+            return np.sum((-1*y*np.log(self.forward(x))))/y.shape[-1]
+
         return np.sum((y - self.forward(x))**2)/(2*y.shape[-1])
     
     def accuracy(self,x,y,thisAxis = 0):
